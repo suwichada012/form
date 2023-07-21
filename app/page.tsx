@@ -1,17 +1,12 @@
 "use client";
-import Modal from "react-modal";
-import { useState } from "react";
+import useStore from "@/components/utils/store";
+import Form from "@/components/form-rhf";
 export default function Home() {
-  const [open, setOpen] = useState(false);
+  const [setOpen] = useStore((state) => [state.setOpen]);
   return (
     <div>
       <button onClick={() => setOpen(true)}>Open</button>
-      <div>
-        <Modal isOpen={open}>
-          <div>I am a modal</div>
-          <button onClick={() => setOpen(false)}>Close</button>
-        </Modal>
-      </div>
+      <Form />
     </div>
   );
 }
