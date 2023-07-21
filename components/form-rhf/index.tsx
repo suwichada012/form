@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorMessage } from "@hookform/error-message";
 import * as z from "zod";
-
+import { jsonStringifyRecursive } from "../utils/lib";
 Modal.setAppElement("#form");
 
 const Form = () => {
@@ -45,6 +45,7 @@ const Form = () => {
     },
   });
 
+  console.log(errors);
   const values = useWatch({ control });
   return (
     <div id="form">
@@ -86,7 +87,7 @@ const Form = () => {
         </button>
 
         <div>{JSON.stringify(values, null, 2)}</div>
-        {/* <div>{JSON.stringify(errors, null, 2)}</div> */}
+        <div>{jsonStringifyRecursive(errors)}</div>
       </Modal>
     </div>
   );
