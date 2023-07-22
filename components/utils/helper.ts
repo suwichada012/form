@@ -1,5 +1,6 @@
 import { FieldErrors } from "react-hook-form";
 import { type Form } from "./types";
+import { faker } from "@faker-js/faker";
 
 export function getErrMsg(errors: FieldErrors<Form>) {
   const err: {
@@ -20,4 +21,31 @@ export function getErrMsg(errors: FieldErrors<Form>) {
   });
 
   return err;
+}
+
+export function getInitData(blank = false): Form {
+  if (blank) {
+    return {
+      firstName: "",
+      lastName: "",
+      email: "",
+      dateOfBirth: "",
+      password: "",
+      confirmPassword: "",
+    };
+  }
+  const passwd = faker.internet.password();
+  const dob = faker.date.past();
+  const day = dob.getDate();
+  const month = dob.getMonth();
+  const year = dob.getFullYear();
+
+  return {
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    email: faker.internet.email(),
+    dateOfBirth: `${year}-${month}-${day}`,
+    password: passwd,
+    confirmPassword: passwd,
+  };
 }
