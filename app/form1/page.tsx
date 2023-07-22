@@ -1,6 +1,7 @@
 "use client";
 import useStore from "@components/utils/store";
-import FormRHF from "@components/form-rhf";
+
+import FormVanilla from "@components/form-vanilla";
 import useUsers from "@components/utils/useUsers";
 import UserList from "@components/utils/UserList";
 
@@ -16,7 +17,7 @@ export default function Form1() {
           <UserList key={user.id} user={user} />
         ))}
       </div>
-      <FormRHF />
+      <FormVanilla />
     </div>
   );
 }
