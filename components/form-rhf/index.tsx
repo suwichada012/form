@@ -43,7 +43,7 @@ const schema = z
       path: ["dateOfBirth"],
     }
   );
-export type schemaType = z.infer<typeof schema>;
+type schemaType = z.infer<typeof schema>;
 
 const Form = () => {
   const [open, setOpen] = useStore((state) => [state.open, state.setOpen]);
@@ -163,7 +163,7 @@ function getErrMsg(errors: FieldErrors<schemaType>) {
     confirmPassword: errors.confirmPassword?.message || "",
   };
 
-  const errFilt = Object.keys(err).forEach((key) => {
+  Object.keys(err).forEach((key) => {
     if (err[key] === "") {
       delete err[key];
     }
