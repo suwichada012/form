@@ -23,9 +23,10 @@ const FormRHF = () => {
   const rhf = useForm<Form>({
     resolver: zodResolver(formSchema),
     defaultValues: getInitData(true),
+    mode: "onTouched", // Try onSubmit
   });
   const { register, handleSubmit, watch, reset, setValue, formState } = rhf;
-  const { errors, isSubmitting } = formState;
+  const { errors, isSubmitting, isValid } = formState;
   // const values = watch();
 
   async function sendData(data: Form) {
@@ -112,7 +113,7 @@ const FormRHF = () => {
             />
             <ErrorMessage errors={errors} name="confirmPassword" />
           </div>
-          <button type="submit" disabled={isSubmitting}>
+          <button type="submit" disabled={isSubmitting || !isValid}>
             {formState.isSubmitting ? "Working" : "Submit"}
           </button>
           <button
