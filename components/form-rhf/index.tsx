@@ -1,31 +1,53 @@
 "use client";
 import Modal from "react-modal";
 import useStore from "../utils/store";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorMessage } from "@hookform/error-message";
 import * as z from "zod";
-import { jsonStringifyRecursive } from "../utils/lib";
+import axios from "axios";
 Modal.setAppElement("#form");
+
+const schema = z
+  .object({
+    firstName: z.string().min(1, { message: "Required" }),
+    lastName: z.string().min(1, { message: "Required" }),
+    email: z.string().email({ message: "Invalid email" }),
+    dateOfBirth: z.string().min(1, { message: "Required" }),
+    password: z
+      .string()
+      .min(4, { message: "Must be longer than 4 characters" }),
+    confirmPassword: z.string().min(1, { message: "Required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+  .refine(
+    (data) => {
+      return z.coerce.date().safeParse(data.dateOfBirth).success;
+    },
+    {
+      message: "Plase input valid date",
+      path: ["dateOfBirth"],
+    }
+  )
+  .refine(
+    (data) => {
+      const nYear = new Date().getFullYear();
+      const bYear = new Date(data.dateOfBirth).getFullYear();
+      return nYear - bYear >= 18;
+    },
+    {
+      message: "You must be 18 years old",
+      path: ["dateOfBirth"],
+    }
+  );
+export type schemaType = z.infer<typeof schema>;
 
 const Form = () => {
   const [open, setOpen] = useStore((state) => [state.open, state.setOpen]);
 
-  const schema = z
-    .object({
-      firstName: z.string().min(1, { message: "Required" }),
-      lastName: z.string().min(1, { message: "Required" }),
-      email: z.string().email({ message: "Invalid email" }),
-      dateOfBirth: z.string().min(1, { message: "Required" }),
-      password: z.string().min(1, { message: "Required" }),
-      confirmPassword: z.string().min(1, { message: "Required" }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],
-    });
-
-  type schemaType = z.infer<typeof schema>;
   const {
     control,
     register,
@@ -36,61 +58,116 @@ const Form = () => {
   } = useForm<schemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      dateOfBirth: "",
-      password: "",
-      confirmPassword: "",
+      firstName: "sdfdsd",
+      lastName: "dddfd",
+      email: "1@1.com",
+      dateOfBirth: "2022-01-01",
+      password: "123",
+      confirmPassword: "123",
     },
   });
 
-  console.log(errors);
   const values = useWatch({ control });
+  console.log({ fd: register("firstName") });
+  // console.log(values);
+
+  function sendData(data: schemaType) {
+    console.log(data);
+    axios
+      .post("/api/register", data)
+      .then((res) => {
+        console.log(res);
+        setOpen(false);
+        reset();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   return (
     <div id="form">
       <Modal isOpen={open}>
-        <div>Add User</div>
+        <form
+          onSubmit={handleSubmit(sendData)}
+          className="flex flex-col gap-2 items-start"
+        >
+          <div>
+            <label htmlFor="firstName">First Name</label>
+            <input {...register("firstName")} type="text" id="firstName" />
+            <ErrorMessage errors={errors} name="firstName" />
+            {/* {errors.firstName?.message && errors.firstName?.message} */}
+          </div>
 
-        <form onSubmit={handleSubmit((d) => console.log(d))}>
-          <input {...register("firstName")} type="text" />
-          <ErrorMessage errors={errors} name="firstName" />
-          {errors.firstName?.message && <p>{errors.firstName?.message}</p>}
+          <div>
+            <label htmlFor="lastName">Last Name</label>
+            <input {...register("lastName")} type="text" id="lastName" />
+            <ErrorMessage errors={errors} name="lastName" />
+          </div>
 
-          <input {...register("lastName")} type="text" />
-          {errors.lastName?.message && <p>{errors.lastName?.message}</p>}
+          <div>
+            <label htmlFor="email">Email</label>
+            <input {...register("email")} type="text" id="email" />
+            <ErrorMessage errors={errors} name="email" />
+          </div>
 
-          <input {...register("email")} type="text" />
-          {errors.email?.message && <p>{errors.email?.message}</p>}
+          <div>
+            <label htmlFor="dateOfBirth">Date of Birth</label>
+            <input {...register("dateOfBirth")} type="text" id="dateOfBirth" />
+            <ErrorMessage errors={errors} name="dateOfBirth" />
+          </div>
 
-          <input {...register("dateOfBirth")} type="date" />
-          {errors.dateOfBirth?.message && <p>{errors.dateOfBirth?.message}</p>}
+          <div>
+            <label htmlFor="password">Password</label>
+            <input {...register("password")} type="password" id="password" />
+            <ErrorMessage errors={errors} name="password" />
+          </div>
 
-          <input {...register("password")} type="password" />
-          {errors.password?.message && <p>{errors.password?.message}</p>}
-
-          <input {...register("confirmPassword")} type="password" />
-          {errors.confirmPassword?.message && (
-            <p>{errors.confirmPassword?.message}</p>
-          )}
-
+          <div>
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              {...register("confirmPassword")}
+              type="password"
+              id="confirmPassword"
+            />
+            <ErrorMessage errors={errors} name="confirmPassword" />
+          </div>
           <button type="submit">Submit</button>
+          <button
+            onClick={() => {
+              setOpen(false);
+              reset();
+            }}
+          >
+            Close
+          </button>
         </form>
 
-        <button
-          onClick={() => {
-            setOpen(false);
-            reset();
-          }}
-        >
-          Close
-        </button>
-
         <div>{JSON.stringify(values, null, 2)}</div>
-        <div>{jsonStringifyRecursive(errors)}</div>
+        <div>{JSON.stringify(getErrMsg(errors))}</div>
       </Modal>
     </div>
   );
 };
 
 export default Form;
+
+function getErrMsg(errors: FieldErrors<schemaType>) {
+  const err: {
+    [key: string]: string;
+  } = {
+    firstName: errors.firstName?.message || "",
+    lastName: errors.lastName?.message || "",
+    email: errors.email?.message || "",
+    dateOfBirth: errors.dateOfBirth?.message || "",
+    password: errors.password?.message || "",
+    confirmPassword: errors.confirmPassword?.message || "",
+  };
+
+  const errFilt = Object.keys(err).forEach((key) => {
+    if (err[key] === "") {
+      delete err[key];
+    }
+  });
+
+  return err;
+}
