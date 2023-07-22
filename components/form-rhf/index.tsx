@@ -7,13 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorMessage } from "@hookform/error-message";
 import axios from "axios";
 import { formSchema, type Form } from "@components/utils/types";
-import { getErrMsg } from "@components/utils/helper";
+// import { getErrMsg } from "@components/utils/helper";
 import { URL_DATA } from "utils";
 import { getInitData } from "@components/utils/helper";
 
 Modal.setAppElement("#form");
 
-const Form = () => {
+const FormRHF = () => {
   const [open, setOpen, fetchUsers] = useStore((state) => [
     state.open,
     state.setOpen,
@@ -26,9 +26,8 @@ const Form = () => {
   });
   const { register, handleSubmit, watch, reset, setValue, formState } = rhf;
   const { errors, isSubmitting } = formState;
-  const values = watch();
+  // const values = watch();
 
-  console.log({ init: getInitData(false) });
   async function sendData(data: Form) {
     try {
       const res = await axios.post(URL_DATA, data);
@@ -134,4 +133,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default FormRHF;
