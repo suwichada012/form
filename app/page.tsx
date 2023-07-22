@@ -4,7 +4,7 @@ import Form from "@components/form-rhf";
 import useUsers from "@components/utils/useUsers";
 export default function Home() {
   const [setOpen] = useStore((state) => [state.setOpen]);
-  const { users } = useUsers(false);
+  const { users } = useUsers(true);
   return (
     <div>
       <div>
