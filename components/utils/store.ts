@@ -5,6 +5,8 @@ interface Store {
   setOpen: (open: boolean) => void;
   users: User[];
   setUsers: (users: User[]) => void;
+  fetchUsers: () => void;
+  setFetchUsers: (fetchUsers: () => void) => void;
 }
 
 const useStore = create<Store>((set) => ({
@@ -12,6 +14,8 @@ const useStore = create<Store>((set) => ({
   setOpen: (open) => set({ open }),
   users: [],
   setUsers: (users) => set({ users }),
+  fetchUsers: () => {},
+  setFetchUsers: (fetchUsers) => set({ fetchUsers }),
 }));
 
 export default useStore;
